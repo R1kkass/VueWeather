@@ -47,7 +47,7 @@ export interface IWeatherOneCallApi {
 
 export const WeaterApi = async (name: string) => {
     const response = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${name}&appid=439d4b804bc8187953eb36d2a8c26a02`
+        `https://api.openweathermap.org/data/2.5/weather?q=${name}&appid=c9a7aca0876ab4a034b0cf1ef853afbd`
     );
     return response.data;
 };
@@ -57,7 +57,7 @@ export const WeaterApiCallOne = async (
     lat: number | undefined | string
 ) => {
     const response = await axios.get(
-        `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${ion}&exclude&appid=439d4b804bc8187953eb36d2a8c26a02`
+        `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${ion}&exclude&appid=c9a7aca0876ab4a034b0cf1ef853afbd`
     );
     return response.data;
 };
