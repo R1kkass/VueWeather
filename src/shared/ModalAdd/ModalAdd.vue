@@ -14,21 +14,11 @@ import { Teleport, onMounted, onUnmounted } from "vue";
 
 const emit = defineEmits();
 
-function success(pos: any) {
-  var crd = pos.coords;
 
-  console.log('Ваше текущее местоположение:');
-  console.log(`Широта: ${crd.latitude}`);
-  console.log(`Долгота: ${crd.longitude}`);
-  console.log(`Плюс-минус ${crd.accuracy} метров.`);
-  console.log(crd);
-  
-
-};
 
 onMounted(() => {
     document.body.style.overflowY = "hidden";
-    console.log(navigator.geolocation.getCurrentPosition(success));
+    
     
 });
 

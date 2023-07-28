@@ -1,8 +1,10 @@
 <template>
     <div class="Unit">
-        <div class="Unit__more"></div>
+        <div class="Unit__more">
+            <slot/>
+        </div>
         <div class="Unit__name">
-            <slot />
+            <slot name="name"/>
         </div>
         <div @click="deleteCity()" class="Unit__delete">
             <img src="../../assets/delete.svg" />

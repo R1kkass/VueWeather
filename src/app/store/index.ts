@@ -10,7 +10,8 @@ export interface ICity {
     order: number;
 }
 
-export default createStore({
+
+export default createStore<IState>({
     state: {
         city: JSON.parse(localStorage.getItem("city") || "[]"),
     },
@@ -23,6 +24,7 @@ export default createStore({
             state.city = state.city.filter((cit) => {
                 return cit.id != id;
             });
+            localStorage.setItem("city", JSON.stringify(state.city));
         },
         resetCity(state: IState, city: ICity[]) {
             state.city = city.sort((a, b) => a.order - b.order);

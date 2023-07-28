@@ -1,48 +1,24 @@
 <template>
-    <div v-if="weather && callone" class="Weather">
+    <div v-if="callone" class="Weather">
         <div class="Weather__name">
             <p>
-                {{ name }},
-                {{ weather?.sys.country }}
+                {{ name || "Not found" }},
+                {{ weather?.sys.country || callone?.timezone }}
             </p>
         </div>
         <div class="Weather__mainInfo">
             <img
-                :src="`https://openweathermap.org/img/wn/${weather?.weather[0].icon}.png`"
+                :src="`https://openweathermap.org/img/wn/${
+                    weather?.weather[0].icon || callone?.current.weather[0].icon
+                }.png`"
             />
-            <p>{{ Math.round(Number(weather?.main.temp) - 273.15) }} °C</p>
+            <p>{{ temp(weather?.main.temp || callone?.current.temp) }} °C</p>
         </div>
         <div class="Weather__secondaryInfo">
-            <p>
-                Feels like
-                {{ weather && Math.round(weather?.main.feels_like - 273.15) }}
-                °C.
-                {{ weather?.weather[0].main }}
-                {{ toUpper(String(weather?.weather[0].main)) }}.
-                {{ toUpper(String(weather?.weather[0].description)) }}
-            </p>
+            <FeelsLike :weather="weather" :callone="callone"/>
         </div>
         <div class="Weather__grid">
-            <div>
-                <img src="../../assets/cursor.svg" />
-                <p>{{ weather?.wind.speed }}m/s</p>
-            </div>
-            <div></div>
-            <div>
-                <p>Humidity: {{ weather?.main.humidity }}%</p>
-            </div>
-            <div>
-                <p>
-                    Dew point:
-                    {{ Math.floor(Number(callone?.current.dew_point)) }} °C
-                </p>
-            </div>
-            <div>
-                <p>
-                    Visibility:
-                    {{ (Number(weather?.visibility) / 1000).toFixed(1) }}km
-                </p>
-            </div>
+            <AnyInfoWeather :weather="weather" :callone="callone"/>
         </div>
     </div>
     <div v-else class="WeatherLoading Weather"></div>
@@ -56,7 +32,9 @@ import {
     WeaterApiCallOne,
 } from "../../app/api/WeatherApi";
 import { ref, Ref, onMounted } from "vue";
-import { toUpper } from "../../app/utils/toUpper";
+import FeelsLike from "../FeelsLike/FeelsLike.vue";
+import { temp } from "../../app/utils/temp";
+import AnyInfoWeather from "../AnyInfoWeather/AnyInfoWeather.vue"
 
 const weather: Ref<IWeatherApi | undefined> = ref();
 const callone: Ref<IWeatherOneCallApi | undefined> = ref();
@@ -66,14 +44,31 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    lon: {
+        type: Number,
+    },
+    lat: {
+        type: Number,
+    },
 });
 
 onMounted(async () => {
-    weather.value = await WeaterApi(props.name);
-    callone.value = await WeaterApiCallOne(
-        weather.value?.coord.lon,
-        weather.value?.coord.lat
-    );
+    WeaterApi(props.name)
+        .then(async (e) => {
+            weather.value = e;
+            callone.value = await WeaterApiCallOne(
+                weather.value?.coord.lon,
+                weather.value?.coord.lat
+            );
+        })
+        .catch(async () => {
+            callone.value = await WeaterApiCallOne(
+                props.lon?.toFixed(1),
+                props.lat?.toFixed(1)
+            );
+        });
+
+    console.log(callone.value);
 });
 </script>
 
@@ -91,11 +86,11 @@ onMounted(async () => {
 .WeatherLoading {
     min-height: 300px;
     background: linear-gradient(
-            120deg,
-            rgba(2, 0, 36, 0) 0%,
-            rgba(0, 0, 0, 1) 30%,
-            rgba(0, 212, 255, 0) 100%
-        );
+        120deg,
+        rgba(2, 0, 36, 0) 0%,
+        rgba(0, 0, 0, 1) 30%,
+        rgba(0, 212, 255, 0) 100%
+    );
     transition: 0.3s;
     background-size: 1000px 1000px;
     animation: loading 2s alternate infinite;
